@@ -3,7 +3,6 @@ using SephoraSearchEngine.Models;
 using SephoraSearchEngine.Services;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
@@ -74,11 +73,6 @@ namespace SephoraSearchEngine
         private void ApiKeysTextBox_TextChanged(object sender, EventArgs e)
         {
             _apiKeys = ApiKeysTextBox.Text.Replace("\r", "").Split('\n').ToList();
-
-            //var result = string.Join("", (ProductsGrid.DataSource as BindingList<Product>)
-            //    .Where(product => string.IsNullOrEmpty(product.IncludedBadWords))
-            //    .OrderByDescending(product => product.Rating)
-            //    .Select(product => $"<tr><td>{product.Brand}</td><td>{product.Name}</td><td>{product.Rating}</td><td>{product.Reviews}</td><td>{product.Ingredients}</td></tr>"));
         }
 
         private async void LoadCategoriesButton_Click(object sender, EventArgs e)
@@ -159,6 +153,16 @@ namespace SephoraSearchEngine
                     foundRow.DefaultCellStyle.BackColor = Color.Red;
                 }
             }
+        }
+
+        private void ExportButton_Click(object sender, EventArgs e)
+        {
+            var result = string.Join("", (ProductsGrid.DataSource as BindingList<Product>)
+                .Where(product => string.IsNullOrEmpty(product.IncludedBadWords))
+                .OrderByDescending(product => product.Rating)
+                .Select(product => $"<tr><td>{product.Brand}</td><td>{product.Name}</td><td>{product.Rating}</td><td>{product.Reviews}</td><td>{product.Ingredients}</td></tr>"));
+            var textToCopy = $"<table>{result}</table>";
+            Clipboard.SetDataObject(textToCopy, true);
         }
     }
 }

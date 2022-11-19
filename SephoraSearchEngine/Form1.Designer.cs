@@ -30,13 +30,14 @@ namespace SephoraSearchEngine
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
+            this.BadWordsTextBox = new System.Windows.Forms.TextBox();
             this.LoadCategoriesButton = new System.Windows.Forms.Button();
             this.CategoryTree = new System.Windows.Forms.TreeView();
             this.ApiKeysTextBox = new System.Windows.Forms.RichTextBox();
             this.panel2 = new System.Windows.Forms.Panel();
             this.LogWindow = new System.Windows.Forms.RichTextBox();
             this.ProductsGrid = new System.Windows.Forms.DataGridView();
-            this.BadWordsTextBox = new System.Windows.Forms.TextBox();
+            this.ExportButton = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ProductsGrid)).BeginInit();
@@ -48,6 +49,7 @@ namespace SephoraSearchEngine
             | System.Windows.Forms.AnchorStyles.Left)));
             this.panel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.panel1.BackColor = System.Drawing.SystemColors.Control;
+            this.panel1.Controls.Add(this.ExportButton);
             this.panel1.Controls.Add(this.BadWordsTextBox);
             this.panel1.Controls.Add(this.LoadCategoriesButton);
             this.panel1.Controls.Add(this.CategoryTree);
@@ -56,6 +58,15 @@ namespace SephoraSearchEngine
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(445, 598);
             this.panel1.TabIndex = 5;
+            // 
+            // BadWordsTextBox
+            // 
+            this.BadWordsTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.BadWordsTextBox.Location = new System.Drawing.Point(12, 502);
+            this.BadWordsTextBox.Name = "BadWordsTextBox";
+            this.BadWordsTextBox.Size = new System.Drawing.Size(430, 20);
+            this.BadWordsTextBox.TabIndex = 6;
+            this.BadWordsTextBox.TextChanged += new System.EventHandler(this.BadWordsTextBox_TextChanged);
             // 
             // LoadCategoriesButton
             // 
@@ -84,9 +95,9 @@ namespace SephoraSearchEngine
             // 
             this.ApiKeysTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.ApiKeysTextBox.Location = new System.Drawing.Point(0, 502);
+            this.ApiKeysTextBox.Location = new System.Drawing.Point(0, 528);
             this.ApiKeysTextBox.Name = "ApiKeysTextBox";
-            this.ApiKeysTextBox.Size = new System.Drawing.Size(445, 96);
+            this.ApiKeysTextBox.Size = new System.Drawing.Size(445, 70);
             this.ApiKeysTextBox.TabIndex = 3;
             this.ApiKeysTextBox.Text = "";
             this.ApiKeysTextBox.TextChanged += new System.EventHandler(this.ApiKeysTextBox_TextChanged);
@@ -132,13 +143,16 @@ namespace SephoraSearchEngine
             this.ProductsGrid.Size = new System.Drawing.Size(673, 467);
             this.ProductsGrid.TabIndex = 5;
             // 
-            // BadWordsTextBox
+            // ExportButton
             // 
-            this.BadWordsTextBox.Location = new System.Drawing.Point(143, 473);
-            this.BadWordsTextBox.Name = "BadWordsTextBox";
-            this.BadWordsTextBox.Size = new System.Drawing.Size(299, 20);
-            this.BadWordsTextBox.TabIndex = 6;
-            this.BadWordsTextBox.TextChanged += new System.EventHandler(this.BadWordsTextBox_TextChanged);
+            this.ExportButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ExportButton.Location = new System.Drawing.Point(317, 471);
+            this.ExportButton.Name = "ExportButton";
+            this.ExportButton.Size = new System.Drawing.Size(125, 23);
+            this.ExportButton.TabIndex = 7;
+            this.ExportButton.Text = "Export";
+            this.ExportButton.UseVisualStyleBackColor = true;
+            this.ExportButton.Click += new System.EventHandler(this.ExportButton_Click);
             // 
             // Form1
             // 
@@ -166,6 +180,7 @@ namespace SephoraSearchEngine
         private System.Windows.Forms.RichTextBox LogWindow;
         private System.Windows.Forms.DataGridView ProductsGrid;
         private System.Windows.Forms.TextBox BadWordsTextBox;
+        private System.Windows.Forms.Button ExportButton;
     }
 }
 

@@ -21,8 +21,8 @@ namespace SephoraSearchEngine.Services
         public async Task<IList<Category>> GetRootCategories()
         {
             var getRootCategoriesRequest = new RestRequest("categories/v2/list-root", Method.Get);
-            var response = await ExecuteRequest(getRootCategoriesRequest);
-            return JsonConvert.DeserializeObject<RootCategoriesDto>(response.Content).RootCategories;
+            var response = await ExecuteRequest<RootCategoriesDto>(getRootCategoriesRequest);
+            return response.RootCategories;
         }
 
         public async Task LoadSubCategories(Category category)
@@ -41,8 +41,8 @@ namespace SephoraSearchEngine.Services
             var getSubCategoriesRequest = new RestRequest("categories/list", Method.Get);
             getSubCategoriesRequest.AddParameter("categoryId", category.Id);
 
-            var response = await ExecuteRequest(getSubCategoriesRequest);
-            category.SubCategories = JsonConvert.DeserializeObject<ChildCategoriesDto>(response.Content).ChildCategories;
+            var response = await ExecuteRequest<ChildCategoriesDto>(getSubCategoriesRequest);
+            category.SubCategories = response.ChildCategories;
 
             OnCategoryLoaded?.Invoke(this, category);
         }
@@ -59,21 +59,25 @@ namespace SephoraSearchEngine.Services
                 var getProductsRequest = new RestRequest("products/list");
                 getProductsRequest.AddParameter("categoryId", category.Id);
                 getProductsRequest.AddParameter("currentPage", page);
-                var productsResponse = await ExecuteRequest(getProductsRequest);
-                var productsAtPage = JsonConvert.DeserializeObject<ProductsListDto>(productsResponse.Content).Products;
+                var productsResponse = await ExecuteRequest<ProductsListDto>(getProductsRequest);
 
-                if (productsAtPage.Length == 0)
+                if (productsResponse.Products.Length == 0)
                 {
                     break;
                 }
 
-                foreach (var product in productsAtPage)
+                foreach (var product in productsResponse.Products)
                 {
                     await LoadProductDetails(product);
                     OnProductLoaded?.Invoke(this, product);
+
+                    if (product.IncludedBadWords.Length == 0)
+                    {
+                        await CheckAvailability(product, 50.061597, 19.938049, 15);
+                    }
                 }
 
-                category.Products = category.Products.Concat(productsAtPage).ToArray();
+                category.Products = category.Products.Concat(productsResponse.Products).ToArray();
             }
         }
 
@@ -87,34 +91,48 @@ namespace SephoraSearchEngine.Services
             var productDetailsRequest = new RestRequest("products/detail");
             productDetailsRequest.AddParameter("productId", product.Id);
             productDetailsRequest.AddParameter("preferedSku", product.CurrentSku.Id);
-            var productDetailsResponse = await ExecuteRequest(productDetailsRequest);
+            var productDetailsResponse = await ExecuteRequest<dynamic>(productDetailsRequest);
 
-            dynamic data = JsonConvert.DeserializeObject(productDetailsResponse.Content);
-            product.Ingredients = data?.currentSku?.ingredientDesc;
+            product.Ingredients = productDetailsResponse?.currentSku?.ingredientDesc;
         }
 
-        private string SubstringByBoundText(string source, string leftBound, string rightBound)
+        public async Task CheckAvailability(Product product, double latitude, double longitude, double radius)
         {
-            return SubstringByIndexes(source, source.IndexOf(leftBound) + leftBound.Length - 1, source.LastIndexOf(rightBound));
+            if (product.CurrentSku == null)
+            {
+                return;
+            }
+
+            var productAvailabilityRequest = new RestRequest("products/check-availability");
+            productAvailabilityRequest.AddParameter("skuId", product.CurrentSku.Id);
+            productAvailabilityRequest.AddParameter("latitude", latitude.ToString().Replace(',', '.'));
+            productAvailabilityRequest.AddParameter("longitude", longitude.ToString().Replace(',', '.'));
+            productAvailabilityRequest.AddParameter("radius", radius);
+            var productAvailabilityResponse = await ExecuteRequest<AvailabilityDto>(productAvailabilityRequest);
+
+            product.IsAvailable = productAvailabilityResponse.Stores.Length != 0;
         }
 
-        private string SubstringByIndexes(string source, int startIndex, int endIndex)
-        {
-            return source.Substring(startIndex, endIndex - startIndex + 1);
-        }
-
-        private async Task<RestResponse> ExecuteRequest(RestRequest restRequest)
+        private async Task<TDataItem> ExecuteRequest<TDataItem>(RestRequest restRequest)
         {
             try
             {
                 AddRapidApiHeaders(restRequest);
-                return await _restClient.ExecuteAsync(restRequest);
+                var response = await _restClient.ExecuteAsync(restRequest);
+                var result = JsonConvert.DeserializeObject<TDataItem>(response.Content);
+
+                if(!response.IsSuccessful)
+                {
+                    throw new Exception(response.Content);
+                }
+
+                return result;
             }
             catch(Exception ex)
             {
                 OnApiKeyBroken?.Invoke(this, new EventArgs());
                 await Task.Delay(1000);
-                return await ExecuteRequest(restRequest);
+                return await ExecuteRequest<TDataItem>(restRequest);
             }
         }
 

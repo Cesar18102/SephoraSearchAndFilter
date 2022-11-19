@@ -24,5 +24,6 @@ namespace SephoraSearchEngine.Models
 
         public string Ingredients { get; set; }
         public string IncludedBadWords { get; set; }
+        public bool IsAvailable { get; set; }
     }
 }

@@ -83,6 +83,7 @@
     <Compile Include="Dto\ChildCategoriesDto.cs" />
     <Compile Include="Dto\ProductsListDto.cs" />
     <Compile Include="Dto\RootCategoriesDto.cs" />
+    <Compile Include="Dto\StoreDto.cs" />
     <Compile Include="Extensions\CategoryExtensions.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
